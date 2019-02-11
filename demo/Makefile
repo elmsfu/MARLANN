@@ -61,6 +61,19 @@ marlann_post.v: marlann.asc
 
 #####################################################################
 
+
+ice2osc.json: ice2osc.v
+	yosys -ql ice2osc.log -p 'synth_ice40 -top ice2osc -json ice2osc.json' ice2osc.v
+
+ice2osc.asc: ice2osc.pcf ice2osc.json
+	nextpnr-ice40 --freq 13 --up5k --asc ice2osc.asc --pcf ice2osc.pcf --json ice2osc.json
+
+ice2osc.bin: ice2osc.asc
+	icetime -d up5k -c 12 -mtr ice2osc.rpt ice2osc.asc
+	icepack ice2osc.asc ice2osc.bin
+
+#####################################################################
+
 ctrlsoc.json: $(SOC_RTL) $(CAMERA_RTL) flashinit.hex
 	yosys -ql ctrlsoc.log -p 'synth_ice40 -top ctrlsoc -json ctrlsoc.json' $(filter %.v, $^)
 

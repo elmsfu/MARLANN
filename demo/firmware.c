@@ -485,7 +485,7 @@ void main()
 	}
 #endif
 
-	ml_test();
+//	ml_test();
 	print("\n");
 
 	reg_leds = 127;
