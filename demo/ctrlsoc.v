@@ -16,10 +16,31 @@
  */
 
 `timescale 1 ns / 1 ps
+module pll(
+	input  clock_in,
+	output clock_out,
+	output locked
+	);
+
+SB_PLL40_CORE #(
+		.FEEDBACK_PATH("SIMPLE"),
+		.DIVR(4'b0000),		// DIVR =  0
+		.DIVF(7'b0101000),	// DIVF = 40
+		.DIVQ(3'b110),		// DIVQ =  6
+		.FILTER_RANGE(3'b010)	// FILTER_RANGE = 2
+	) uut (
+		.LOCK(locked),
+		.RESETB(1'b1),
+		.BYPASS(1'b0),
+		.REFERENCECLK(clock_in),
+		.PLLOUTCORE(clock_out)
+		);
+
+endmodule
 
 module ctrlsoc (
 	// 12 MHz clock
-	input clk,
+	input hclk,
 
 	// RS232
 	input  ser_rx,
@@ -37,21 +58,39 @@ module ctrlsoc (
 	output ledr_n,
 	output ledg_n,
 
-	// LEDs and Buttons (PMOD 2)
-	output led1,
-	output led2,
-	output led3,
-	output led4,
-	output led5,
-	input  btn1,
-	input  btn2,
-	input  btn3,
-
+		output ledb,
+		output p9,
+		output p10,
+		output p11
 	// mlaccel ctrl pins
-	output ml_csb,
-	input  ml_rdy,
-	input  ml_err
 );
+
+   wire clk;
+   wire pclk;
+   
+   //assign clk = hclk;
+   
+   pll hpll (.clock_in(hclk), .clock_out(pclk));
+   
+//    wire        clk;
+   
+// SB_HFOSC inthosc (
+//   .CLKHFPU(1'b1),
+//   .CLKHFEN(1'b1),
+//   .CLKHF(clk)
+// );
+
+   reg [30:0] 	       count  = 0;
+   always @(posedge pclk) begin
+      count <= count + 1;
+   end
+   assign clk = count[1];
+   
+   assign ledb = 1;//count[4];
+   assign p9 = clk;
+   assign p10 = resetn;
+   assign p11 = 1;
+            
 	reg resetn = 0;
 	reg [5:0] reset_cnt = 0;
 
@@ -69,8 +108,8 @@ module ctrlsoc (
 		last_flash_clk <= {last_flash_clk, flash_clk};
 	end
 
-	assign ledr_n = !(trap || buserror);
-	assign ledg_n = flash_csb || ((|last_flash_clk) == (&last_flash_clk));
+   assign ledr_n = !trap;//!(trap || buserror);
+   assign ledg_n = 1;//flash_csb || ((|last_flash_clk) == (&last_flash_clk));
 
 	reg led5_r, led4_r, led3_r, led2_r, led1_r;
 

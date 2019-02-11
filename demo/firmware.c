@@ -196,6 +196,7 @@ void main()
 	char wbuf1[64] = "read this then everything is working fine.\n";
 	char rbuf[64];
 
+#if 0
 	ml_write(0, wbuf0, 64);
 	ml_write(70, wbuf1, 64);
 
@@ -204,7 +205,7 @@ void main()
 
 	ml_read(70, rbuf, 64);
 	print(rbuf);
-
+#endif
 	reg_leds = 127;
 	while (1) {
 		print("Press ENTER to continue..\n");
