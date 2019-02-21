@@ -27,7 +27,7 @@
  *     Framebuffer:
  *        Starts at 0x8000
  *        Pixel Address = 0x8000 + 4 * (64 * y + x)
- *        Data is in bits 7..0 of result
+ *        Data is in bits 23..0 of result
 */
 
 module cameraif(
@@ -95,7 +95,7 @@ module cameraif(
 
     wire [5:0] read_x = addr[7:2];
 	wire [4:0] read_y = addr[12:8];
-	wire [7:0] ds_read_data;
+	wire [31:0] ds_read_data;
 	downsample ds_i(
 		.pixel_clock(video_clk),
 		.in_line(in_line),
@@ -162,7 +162,7 @@ module cameraif(
     end
 
     assign rdata = i2c_read_last ? {30'b0, i2c_read} :
-                                   {24'b0, ds_read_data};
+                                   ds_read_data;
 
     // Debugging
     reg [22:0] hb_ctr;

@@ -28,6 +28,6 @@ void camera_i2c_write(uint16_t address, uint8_t data);
 void camera_init();
 
 // Copy 40x30 to buffer
-void acquire_image(uint8_t *buffer);
+void acquire_image(uint32_t *buffer);
 
 #endif

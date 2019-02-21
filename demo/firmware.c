@@ -30,7 +30,7 @@ extern uint32_t sram;
 #define RUN_LOOP          0
 #define SER_TIMEOUT 1500000
 #define ML_TIMEOUT      100
-#define NUM_IMAGES       10
+#define NUM_IMAGES       2
 #define IMAGE_NOPS    10000
 #define ENABLE_CAMERA     1
 
@@ -451,18 +451,20 @@ void ml_test()
 // --------------------------------------------------------
 
 void print_image() {
-    uint8_t buf[30*40];
+    uint32_t buf[30*40];
     print("Acquiring image\n");
     acquire_image(buf);
     print("----------------------------------------\n");
 
-    int addr = 0;
-    for (int y = 0; y < 30; y++) {
+    for (int z = 2; z >=0; z--) {
+      int addr = 0;
+      for (int y = 0; y < 30; y++) {
         for (int x = 0; x < 40; x++) {
-           print_hex(buf[addr++], 2);
-           print(" ");
+          print_hex(0xff & (buf[addr++]>>(z*8)), 2);
+          print(" ");
         }
         print("\n");
+      }
     }
 }
 

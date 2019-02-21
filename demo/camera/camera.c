@@ -19,7 +19,7 @@
 #define CAMERA_BASE 0x03000000
 
 #define reg_camera_i2c (*(volatile uint32_t*)CAMERA_BASE)
-#define reg_camera_fb  ((volatile uint8_t*)(CAMERA_BASE + 0x8000))
+#define reg_camera_fb  ((volatile uint32_t*)(CAMERA_BASE + 0x8000))
 
 static void i2c_delay() {
     for (volatile int i = 0; i < 10; i++)
@@ -129,24 +129,24 @@ void camera_init() {
 	//camera_i2c_write(0x0257,  232); // ANA_GAIN_GLOBAL_B
 
 
-	//camera_i2c_write(0x0600,  0x00); // Test pattern: disable
-	//camera_i2c_write(0x0601,  0x00); // Test pattern: disable
+	camera_i2c_write(0x0600,  0x00); // Test pattern: disable
+	camera_i2c_write(0x0601,  0x00); // Test pattern: disable
 
 #if 0
 	camera_i2c_write(0x0600,  0x00); // Test pattern: solid colour
 	camera_i2c_write(0x0601,  0x01); //
 
 	camera_i2c_write(0x0602,  0x02); // Test pattern: red
-	camera_i2c_write(0x0603,  0xAA); //
+	camera_i2c_write(0x0603,  0x04); //
 
 	camera_i2c_write(0x0604,  0x02); // Test pattern: greenR
-	camera_i2c_write(0x0605,  0xAA); //
+	camera_i2c_write(0x0605,  0x0c); //
 
 	camera_i2c_write(0x0606,  0x02); // Test pattern: blue
-	camera_i2c_write(0x0607,  0xAA); //
+	camera_i2c_write(0x0607,  0x08); //
 
 	camera_i2c_write(0x0608,  0x02); // Test pattern: greenB
-	camera_i2c_write(0x0609,  0xAA); //
+	camera_i2c_write(0x0609,  0x0c); //
 
 
 	camera_i2c_write(0x0624,  0x0A); // Test pattern width
@@ -161,8 +161,8 @@ void camera_init() {
 	camera_i2c_write(0x0100, 0x01);
 }
 
-void acquire_image(uint8_t *buffer) {
+void acquire_image(uint32_t *buffer) {
     for (int y = 0; y < 30; y++)
         for (int x = 0; x < 40; x++)
-            *(buffer++) = reg_camera_fb[((y << 6) | x) << 2];
+          *(buffer++) = reg_camera_fb[(((y << 6) | x) << 0)];
 }
